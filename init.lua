@@ -7,16 +7,7 @@ init.ready          = false
 local log = require 'log'
 require 'constants'
 local config = require 'config'
-
--- flash LED until ready is set
-gpio.mode(PIN_LED, gpio.OUTPUT)
-tmr.alarm(TIMER_READY, 3000, tmr.ALARM_AUTO, function()
-    if (init.ready) then
-        tmr.unregister(TIMER_READY)
-    else
-        gpio.serout(PIN_LED, gpio.LOW, { 50000, 50000 }, 3, 1)
-    end
-end)
+local ready = require 'ready'
 
 -- connect to wifi
 log.info(MODULE, 'connecting to wifi...')
