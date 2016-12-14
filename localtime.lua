@@ -1,24 +1,26 @@
-local localtime = {}
+local MODULE = 'localtime'
+local log = require 'log'
 
+localtime = {}
 localtime.initialized       = false
 localtime.server            = "pool.ntp.org"
 localtime.keep_synchronized = true
 localtime.tz_offset         = config and config.tz_offset
-localtime.debug             = true
+localtime.debug             = false
 
 if localtime.tz_offset == nil then
     localtime.tz_offset = -5.0
-    print("*WARN* localtime: time zone offset not set; assuming "..localtime.tz_offset)
+    log.warn(MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
 end
 
-print("*INFO* localtime: attempting time synchronization...")
+log.info(MODULE, "attempting time synchronization...")
 sntp.sync(localtime.server,
     function(sec, usec, server, info)
         localtime.initialized = true
-        print("*INFO* localtime: time synchronization succeeded with "..server)
+        log.info(MODULE, "time synchronization succeeded with "..server)
     end,
     function()
-        print("*ERROR* localtime: time synchronization feiled")
+        log.fatal(MODULE, "time synchronization feiled")
     end,
     localtime.keep_synchronized
 )
@@ -61,7 +63,7 @@ if localtime.debug then
     tmr.alarm(5, 5000, tmr.ALARM_AUTO, function()
         if localtime.initialized then
             local tm = rtctime.epoch2cal(localtime.time())
-            print(string.format("*DEBUG* localtime: time is %04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+            log.debug(MODULE, string.format("time is %04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
         end
     end)
 end
