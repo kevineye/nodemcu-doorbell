@@ -1,12 +1,16 @@
-MAIN_FILES = {
-}
+local MODULE = 'config'
+local log = require 'log'
 
-PIN_LED         = 4
+config = {}
+config.filename = 'config.json'
 
-TIMER_STARTUP   = 0
-TIMER_WIFI      = 1
-TIMER_READY     = 2
-TIMER_STATUS    = 0
+function config.read_json()
+    log.trace(MODULE, 'loading config from ' .. config.filename)
+    file.open(config.filename, "r")
+    config = cjson.decode(file.read())
+    file.close()
+end
 
-config          = {}
-ready           = false
+config.read_json()
+
+return config
