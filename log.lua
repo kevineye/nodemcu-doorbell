@@ -1,5 +1,15 @@
 local log = {}
 
+log.TRACE   = 1
+log.DEBUG   = 2
+log.INFO    = 3
+log.WARN    = 4
+log.ERROR   = 5
+log.FATAL   = 6
+log.NONE    = 7
+
+log.level   = log.DEBUG
+
 local raw_log = function(level, module, message)
     local ts
 
@@ -19,11 +29,11 @@ local raw_log = function(level, module, message)
     print(string.format("[%-5s%s] %s: %s", level, ts, module, message))
 end
 
-function log.trace(...) raw_log("TRACE", ...) end
-function log.debug(...) raw_log("DEBUG", ...) end
-function log.info(...)  raw_log("INFO",  ...) end
-function log.warn(...)  raw_log("WARN",  ...) end
-function log.error(...) raw_log("ERROR", ...) end
-function log.fatal(...) raw_log("FATAL", ...) end
+function log.trace(...) if log.level <= log.TRACE then raw_log("TRACE", ...) end end
+function log.debug(...) if log.level <= log.DEBUG then raw_log("DEBUG", ...) end end
+function log.info(...)  if log.level <= log.INFO  then raw_log("INFO",  ...) end end
+function log.warn(...)  if log.level <= log.WARN  then raw_log("WARN",  ...) end end
+function log.error(...) if log.level <= log.ERROR then raw_log("ERROR", ...) end end
+function log.fatal(...) if log.level <= log.FATAL then raw_log("FATAL", ...) end end
 
 return log
