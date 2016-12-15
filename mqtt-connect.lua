@@ -4,12 +4,12 @@ local log = require 'log'
 local m = {}
 m.TIMER             = 3
 m.STATUS_INTERVAL   = 5 * 60000
-m.clientid          = config.mqtt_clientid
-m.user              = config.mqtt_user
-m.password          = config.mqtt_password
-m.prefix            = config.mqtt_prefix
-m.host              = config.mqtt_host
-m.port              = config.mqtt_port
+m.clientid          = config.get('mqtt_clientid')
+m.user              = config.get('mqtt_user')
+m.password          = config.get('mqtt_password')
+m.prefix            = config.get('mqtt_prefix')
+m.host              = config.get('mqtt_host')
+m.port              = config.get('mqtt_port')
 
 if ready ~= nil then ready.not_ready() end
 
@@ -39,23 +39,15 @@ m.client:on("message", function(client, t, pl)
     log.debug(MODULE, "received " .. t .. ": " .. pl)
     if (t == m.prefix .. "/ping") then
         sendstatus()
-    elseif (t == m.prefix .. "/config") then
+    elseif config ~= nil and t == m.prefix .. "/config" then
         if (pl == "ping") then
-            local msg = cjson.encode(config)
-            log.debug("sending " .. m.prefix .. "/config/json: " .. msg)
-            m:publish(m.prefix .. "/config/json", msg, 0, 0)
+            local msg = cjson.encode(config.get())
+            log.debug(MODULE, "sending " .. m.prefix .. "/config/json: " .. msg)
+            m.client:publish(m.prefix .. "/config/json", msg, 0, 0)
         elseif (pl == "restart") then
             node.restart()
         else
-            local key, value = string.match(pl, "([^=]+)=(.*)")
-            if (key) then
-                config[key] = value
-                file.remove("config.json")
-                file.open("config.json", "w")
-                file.write(cjson.encode(config))
-                file.close()
-                log.warn(MODULE, "updated config " .. key .. " = " .. value)
-            end
+            config.set_string(pl)
         end
     end
 end)

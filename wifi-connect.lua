@@ -2,9 +2,9 @@ local MODULE = 'wifi'
 local log = require 'log'
 
 local w = {}
-w.TIMER = 1
-w.ssid = config.wifi_ssid
-w.password = config.wifi_password
+w.TIMER     = 1
+w.ssid      = config.get('wifi_ssid')
+w.password  = config.get('wifi_password')
 
 w.connect = function(cb)
     log.info(MODULE, 'connecting to ' .. w.ssid .. '...')
