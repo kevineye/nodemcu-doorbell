@@ -1,11 +1,11 @@
 {
-  "wifi_ssid": "-",
-  "wifi_password": "-",
-  "mqtt_prefix": "/esp-mini",
+  "wifi_ssid": "EyeFi",
+  "wifi_password": "scoobysnack01",
+  "mqtt_prefix": "esp-mini",
   "mqtt_clientid": "esp-mini-1",
-  "mqtt_host": "-",
+  "mqtt_host": "192.168.1.110",
   "mqtt_port": 1883,
-  "mqtt_user": "-",
-  "mqtt_password": "-",
+  "mqtt_user": "device",
+  "mqtt_password": "6oq0zXODy#8D",
   "time_zone_offset": -5.0
 }

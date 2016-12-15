@@ -2,12 +2,12 @@ local MODULE = 'config'
 local log = require 'log'
 
 config = {}
-config.filename = 'config.json'
+config.filename = file.exists('config.json') and 'config.json' or 'config.default.json'
 
 if ready ~= nil then ready.not_ready() end
 
 function config.read_json()
-    log.trace(MODULE, 'loading config from ' .. config.filename)
+    log.debug(MODULE, 'loading config from ' .. config.filename)
     file.open(config.filename, "r")
     config = cjson.decode(file.read())
     file.close()
