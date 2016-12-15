@@ -30,6 +30,7 @@ tmr.alarm(init.TIMER_WIFI, 1000, tmr.ALARM_AUTO, function()
                     log.info(MODULE, 'loading ' .. MAIN_MODULES[i])
                     require(MAIN_MODULES[i])
                 end
+                ready.ready()
             end
         end)
     end

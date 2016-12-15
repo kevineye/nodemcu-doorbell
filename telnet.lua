@@ -7,7 +7,10 @@ local telnet = {}
 telnet.port = 2323
 telnet.server = net.createServer(net.TCP, 180)
 
+if ready ~= nil then ready.not_ready() end
 log.info(MODULE, 'listening on ' .. wifi.sta.getip() .. ':' .. telnet.port)
+if ready ~= nil then ready.ready() end
+
 telnet.server:listen(telnet.port, function(socket)
     log.info(MODULE, 'client connected')
     local fifo = {}

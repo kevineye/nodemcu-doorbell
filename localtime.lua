@@ -8,6 +8,8 @@ localtime.keep_synchronized = true
 localtime.tz_offset         = config and config.tz_offset
 localtime.debug             = false
 
+if ready ~= nil then ready.not_ready() end
+
 if localtime.tz_offset == nil then
     localtime.tz_offset = -5.0
     log.warn(MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
@@ -18,9 +20,10 @@ sntp.sync(localtime.server,
     function(sec, usec, server, info)
         localtime.initialized = true
         log.info(MODULE, "time synchronization succeeded with "..server)
+        if ready ~= nil then ready.ready() end
     end,
     function()
-        log.fatal(MODULE, "time synchronization feiled")
+        log.fatal(MODULE, "time synchronization failed")
     end,
     localtime.keep_synchronized
 )
