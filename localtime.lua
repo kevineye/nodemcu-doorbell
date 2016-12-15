@@ -15,7 +15,7 @@ if localtime.tz_offset == nil then
     log.warn(MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
 end
 
-log.info(MODULE, "attempting time synchronization...")
+log.trace(MODULE, "attempting time synchronization...")
 sntp.sync(localtime.server,
     function(sec, usec, server, info)
         localtime.initialized = true

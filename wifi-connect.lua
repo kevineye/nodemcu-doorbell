@@ -7,7 +7,7 @@ w.ssid = config.wifi_ssid
 w.password = config.wifi_password
 
 w.connect = function(cb)
-    log.info(MODULE, 'connecting to wifi...')
+    log.info(MODULE, 'connecting to ' .. w.ssid .. '...')
     if ready ~= nil then ready.not_ready() end
     wifi.setmode(wifi.STATION)
     wifi.sta.config(w.ssid, w.password)
