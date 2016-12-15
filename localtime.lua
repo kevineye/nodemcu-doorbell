@@ -5,7 +5,7 @@ localtime = {}
 localtime.initialized       = false
 localtime.server            = "pool.ntp.org"
 localtime.keep_synchronized = true
-localtime.tz_offset         = config and config.tz_offset
+localtime.tz_offset         = config and config.get('tz_offset')
 localtime.debug             = false
 
 if ready ~= nil then ready.not_ready() end
@@ -13,6 +13,8 @@ if ready ~= nil then ready.not_ready() end
 if localtime.tz_offset == nil then
     localtime.tz_offset = -5.0
     log.warn(MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
+else
+    log.debug(MODULE, "time zone offset set to " .. localtime.tz_offset)
 end
 
 log.trace(MODULE, "attempting time synchronization...")
