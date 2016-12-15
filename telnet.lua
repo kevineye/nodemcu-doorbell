@@ -1,9 +1,15 @@
--- from https://github.com/nodemcu/nodemcu-firmware/blob/master/lua_examples/telnet.lua
+local MODULE = 'telnet'
+local log = require 'log'
 
--- a simple telnet server
+-- adapted from https://github.com/nodemcu/nodemcu-firmware/blob/master/lua_examples/telnet.lua
 
-telnet_srv = net.createServer(net.TCP, 180)
-telnet_srv:listen(2323, function(socket)
+local telnet = {}
+telnet.port = 2323
+telnet.server = net.createServer(net.TCP, 180)
+
+log.info(MODULE, 'listening on ' .. wifi.sta.getip() .. ':' .. telnet.port)
+telnet.server:listen(telnet.port, function(socket)
+    log.info(MODULE, 'client connected')
     local fifo = {}
     local fifo_drained = true
 
@@ -30,8 +36,11 @@ telnet_srv:listen(2323, function(socket)
     end)
     socket:on("disconnection", function(c)
         node.output(nil)        -- un-regist the redirect output function, output goes to serial
+        log.info(MODULE, 'client disconnected')
     end)
     socket:on("sent", sender)
 
-    print("Welcome to NodeMCU world.")
+    log.info(MODULE, 'welcome to NodeMCU')
 end)
+
+return telnet
