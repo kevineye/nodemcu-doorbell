@@ -7,7 +7,7 @@ ready.counter       = 1
 ready.TIMER         = 2
 
 gpio.mode(PIN_LED, gpio.OUTPUT)
-tmr.alarm(ready.TIMER, 1000, tmr.ALARM_AUTO, function()
+tmr.alarm(ready.TIMER, 3000, tmr.ALARM_AUTO, function()
     if (ready.is_ready) then
         tmr.unregister(ready.TIMER)
     else
