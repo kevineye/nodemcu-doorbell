@@ -9,9 +9,10 @@ log.FATAL   = 6
 log.NONE    = 7
 
 log.level   = log.DEBUG
+log.heap    = log.level <= log.DEBUG
 
 local raw_log = function(level, module, message)
-    local ts
+    local ts, h
 
     if localtime and localtime.initialized then
         ts = localtime.time()
@@ -26,7 +27,13 @@ local raw_log = function(level, module, message)
         ts = ""
     end
 
-    print(string.format("[%-5s%s] %s: %s", level, ts, module, message))
+    if log.heap then
+        h = string.format('%6d', node.heap())
+    else
+        h = ''
+    end
+
+    print(string.format("[%-5s%s%s] %s: %s", level, ts, h, module, message))
 end
 
 function log.trace(...) if log.level <= log.TRACE then raw_log("TRACE", ...) end end
