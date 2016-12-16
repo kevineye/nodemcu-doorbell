@@ -4,10 +4,8 @@ init = {}
 init.STARTUP_DELAY  = 3000
 init.TIMER = 0
 
+local app = require 'app'
 local log = require 'log'
-require 'constants'
-local config = require 'config'
-local ready = require 'ready'
 local w = require 'wifi-connect'
 
 w.connect(function()
@@ -17,11 +15,7 @@ w.connect(function()
             log.fatal(MODULE, 'aborting startup; init.lua deleted or renamed')
         else
             file.close("init.lua")
-            for i = 1, #MAIN_MODULES do
-                log.info(MODULE, 'loading ' .. MAIN_MODULES[i])
-                require(MAIN_MODULES[i])
-            end
-            ready.ready()
+            app.run()
         end
     end)
 end)
