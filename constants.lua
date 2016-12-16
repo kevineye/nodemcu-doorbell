@@ -1,7 +1,6 @@
 MAIN_MODULES = {
     'telnet',
     'mqtt-connect',
-    'localtime',
     'sensors'
 }
 
