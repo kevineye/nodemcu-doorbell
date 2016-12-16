@@ -1,7 +1,8 @@
 MAIN_MODULES = {
     'telnet',
     'mqtt-connect',
-    'localtime'
+    'localtime',
+    'sensors'
 }
 
 PIN_LED         = 4
