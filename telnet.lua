@@ -7,12 +7,12 @@ local telnet = {}
 telnet.port = 2323
 telnet.server = net.createServer(net.TCP, 180)
 
-if ready ~= nil then ready.not_ready() end
-log.info(MODULE, 'listening on ' .. wifi.sta.getip() .. ':' .. telnet.port)
-if ready ~= nil then ready.ready() end
+if ready ~= nil then ready = ready + 1 end
+log.log(5, MODULE, 'listening on ' .. wifi.sta.getip() .. ':' .. telnet.port)
+if ready ~= nil then ready = ready - 1 end
 
 telnet.server:listen(telnet.port, function(socket)
-    log.info(MODULE, 'client connected')
+    log.log(5, MODULE, 'client connected')
     local fifo = {}
     local fifo_drained = true
 
@@ -39,11 +39,11 @@ telnet.server:listen(telnet.port, function(socket)
     end)
     socket:on("disconnection", function(c)
         node.output(nil)        -- un-regist the redirect output function, output goes to serial
-        log.info(MODULE, 'client disconnected')
+        log.log(5, MODULE, 'client disconnected')
     end)
     socket:on("sent", sender)
 
-    log.info(MODULE, 'welcome to NodeMCU')
+    log.log(5, MODULE, 'welcome to NodeMCU')
 end)
 
 return telnet

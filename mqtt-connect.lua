@@ -11,38 +11,38 @@ m.prefix            = config.get('mqtt_prefix')
 m.host              = config.get('mqtt_host')
 m.port              = config.get('mqtt_port')
 
-if ready ~= nil then ready.not_ready() end
+if ready ~= nil then ready = ready + 1 end
 
 m.client = mqtt.Client(m.clientid, 60, m.user, m.password)
 m.client:lwt(m.prefix .. "/status", '{"status":"offline"}', 0, 1)
 
-local function sendstatus()
-    local msg = '{"status":"online","ip":"' .. wifi.sta.getip() .. '","heap":' .. node.heap() .. ',"minutesOnline":' .. math.floor(tmr.now() / 60000000) .. '}'
-    log.debug(MODULE, "sending " .. m.prefix .. "/status " .. msg)
+function m.send_status()
+    local msg = '{"status":"online","ip":"' .. wifi.sta.getip() .. '","heap":' .. node.heap() .. ',"minutesOnline":' .. math.floor(tmr.time() / 60) .. '}'
+    log.log(7, MODULE, "sending " .. m.prefix .. "/status " .. msg)
     m.client:publish(m.prefix .. "/status", msg, 0, 1)
 end
 
 m.client:on("connect", function()
-    log.info(MODULE, 'connected to ' .. m.host .. ':' .. m.port)
-    if ready ~= nil then ready.ready() end
+    log.log(5, MODULE, 'connected to ' .. m.host .. ':' .. m.port)
+    if ready ~= nil then ready = ready - 1 end
     m.client:subscribe(m.prefix .. "/ping", 0)
     m.client:subscribe(m.prefix .. "/config", 0)
-    sendstatus()
+    m.send_status()
 end)
 
 m.client:on("offline", function()
-    log.fatal(MODULE, 'disconnected')
+    log.log(1, MODULE, 'disconnected')
 end)
 
 m.client:on("message", function(client, t, pl)
     if pl == nil then pl = "" end
-    log.debug(MODULE, "received " .. t .. ": " .. pl)
+    log.log(7, MODULE, "received " .. t .. ": " .. pl)
     if (t == m.prefix .. "/ping") then
         sendstatus()
     elseif config ~= nil and t == m.prefix .. "/config" then
         if (pl == "ping") then
             local msg = cjson.encode(config.get())
-            log.debug(MODULE, "sending " .. m.prefix .. "/config/json: " .. msg)
+            log.log(7, MODULE, "sending " .. m.prefix .. "/config/json: " .. msg)
             m.client:publish(m.prefix .. "/config/json", msg, 0, 0)
         elseif (pl == "restart") then
             node.restart()
@@ -52,9 +52,11 @@ m.client:on("message", function(client, t, pl)
     end
 end)
 
-tmr.alarm(m.TIMER, m.STATUS_INTERVAL, tmr.ALARM_AUTO, sendstatus)
+if m.STATUS_INTERVAL > 0 then
+    tmr.alarm(m.TIMER, m.STATUS_INTERVAL, tmr.ALARM_AUTO, m.send_status)
+end
 
-log.trace(MODULE, 'connecting to ' .. m.host .. ':' .. m.port)
+log.log(9, MODULE, 'connecting to ' .. m.host .. ':' .. m.port)
 m.client:connect(m.host, m.port, 0, 1)
 
 return m

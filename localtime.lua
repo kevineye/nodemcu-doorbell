@@ -8,24 +8,24 @@ localtime.keep_synchronized = true
 localtime.tz_offset         = config and config.get('tz_offset')
 localtime.debug             = false
 
-if ready ~= nil then ready.not_ready() end
+if ready ~= nil then ready = ready + 1 end
 
 if localtime.tz_offset == nil then
     localtime.tz_offset = -5.0
-    log.warn(MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
+    log.log(4, MODULE, "time zone offset not set; assuming "..localtime.tz_offset)
 else
-    log.debug(MODULE, "time zone offset set to " .. localtime.tz_offset)
+    log.log(7, MODULE, "time zone offset set to " .. localtime.tz_offset)
 end
 
-log.trace(MODULE, "attempting time synchronization...")
+log.log(9, MODULE, "attempting time synchronization...")
 sntp.sync(localtime.server,
     function(sec, usec, server, info)
         localtime.initialized = true
-        log.info(MODULE, "time synchronization succeeded with "..server)
-        if ready ~= nil then ready.ready() end
+        log.log(5, MODULE, "time synchronization succeeded with "..server)
+        if ready ~= nil then ready = ready - 1 end
     end,
     function()
-        log.fatal(MODULE, "time synchronization failed")
+        log.log(1, MODULE, "time synchronization failed")
     end,
     localtime.keep_synchronized
 )
@@ -68,7 +68,7 @@ if localtime.debug then
     tmr.alarm(5, 5000, tmr.ALARM_AUTO, function()
         if localtime.initialized then
             local tm = rtctime.epoch2cal(localtime.time())
-            log.debug(MODULE, string.format("time is %04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+            log.log(7, MODULE, string.format("time is %04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
         end
     end)
 end

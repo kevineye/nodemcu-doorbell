@@ -5,14 +5,14 @@ config = {}
 config.data = {}
 config.filename = file.exists('config.json') and 'config.json' or 'config.default.json'
 
-if ready ~= nil then ready.not_ready() end
+if ready ~= nil then ready = ready + 1 end
 
 function config.read_json()
-    log.debug(MODULE, 'loading config from ' .. config.filename)
+    log.log(7, MODULE, 'loading config from ' .. config.filename)
     file.open(config.filename, "r")
     config.data = cjson.decode(file.read())
     file.close()
-    if ready ~= nil then ready.ready() end
+    if ready ~= nil then ready = ready - 1 end
 end
 
 function config.set_string(s)
@@ -25,7 +25,7 @@ end
 function config.set(key, value)
     config.data[key] = value
     config.save_json()
-    log.warn(MODULE, "updated config " .. key .. " = " .. value)
+    log.log(4, MODULE, "updated config " .. key .. " = " .. value)
 end
 
 function config.get(key)

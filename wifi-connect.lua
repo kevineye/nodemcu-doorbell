@@ -7,19 +7,19 @@ w.ssid      = config.get('wifi_ssid')
 w.password  = config.get('wifi_password')
 
 w.connect = function(cb)
-    log.info(MODULE, 'connecting to ' .. w.ssid .. '...')
-    if ready ~= nil then ready.not_ready() end
+    log.log(5, MODULE, 'connecting to ' .. w.ssid .. '...')
+    if ready ~= nil then ready = ready + 1 end
     wifi.setmode(wifi.STATION)
     wifi.sta.config(w.ssid, w.password)
     tmr.alarm(w.TIMER, 1000, tmr.ALARM_AUTO, function()
         if wifi.sta.getip() == nil then
-            log.trace(MODULE, 'waiting for IP address...')
+            log.log(9, MODULE, 'waiting for IP address...')
         else
             tmr.stop(w.TIMER)
-            log.info(MODULE, 'wifi connection established')
-            log.info(MODULE, 'IP address is ' .. wifi.sta.getip())
+            log.log(5, MODULE, 'wifi connection established')
+            log.log(5, MODULE, 'IP address is ' .. wifi.sta.getip())
             if cb ~= nil then cb() end
-            if ready ~= nil then ready.ready() end
+            if ready ~= nil then ready = ready - 1 end
         end
     end)
 end

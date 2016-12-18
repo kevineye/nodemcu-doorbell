@@ -9,10 +9,10 @@ local log = require 'log'
 local w = require 'wifi-connect'
 
 w.connect(function()
-    log.trace(MODULE, 'waiting to initialize...')
+    log.log(9, MODULE, 'waiting to initialize...')
     tmr.alarm(init.TIMER, init.STARTUP_DELAY, tmr.ALARM_SINGLE, function()
         if file.open("init.lua") == nil then
-            log.fatal(MODULE, 'aborting startup; init.lua deleted or renamed')
+            log.log(1, MODULE, 'aborting startup; init.lua deleted or renamed')
         else
             file.close("init.lua")
             app.run()
