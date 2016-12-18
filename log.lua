@@ -1,19 +1,11 @@
 local log = {}
 
-log.TRACE   = 1
-log.DEBUG   = 2
-log.INFO    = 3
-log.WARN    = 4
-log.ERROR   = 5
-log.FATAL   = 6
-log.NONE    = 7
+log.level   = 8
+log.heap    = log.level >= 7
 
-log.level   = log.DEBUG
-log.heap    = log.level <= log.DEBUG
-
-local raw_log = function(level, module, message)
-    local ts, h
-
+log.log = function(level, module, message)
+    if log.level < level then return end
+    local s, ts
     if localtime and localtime.initialized then
         ts = localtime.time()
     elseif rtctime then
@@ -22,25 +14,22 @@ local raw_log = function(level, module, message)
 
     if ts then
         local tm = rtctime.epoch2cal(ts)
-        ts = string.format(" %02d:%02d:%02d", tm["hour"], tm["min"], tm["sec"])
-    else
-        ts = ""
+        s = string.format("%02d:%02d:%02d", tm["hour"], tm["min"], tm["sec"])
     end
 
     if log.heap then
-        h = string.format('%6d', node.heap())
-    else
-        h = ''
+        s = s .. string.format('%6d', node.heap())
     end
 
-    print(string.format("[%-5s%s%s] %s: %s", level, ts, h, module, message))
+    print(string.format("[%d %s] %s: %s", level, s, module, message))
 end
 
-function log.trace(...) if log.level <= log.TRACE then raw_log("TRACE", ...) end end
-function log.debug(...) if log.level <= log.DEBUG then raw_log("DEBUG", ...) end end
-function log.info(...)  if log.level <= log.INFO  then raw_log("INFO",  ...) end end
-function log.warn(...)  if log.level <= log.WARN  then raw_log("WARN",  ...) end end
-function log.error(...) if log.level <= log.ERROR then raw_log("ERROR", ...) end end
-function log.fatal(...) if log.level <= log.FATAL then raw_log("FATAL", ...) end end
+-- enabling these bloats module's RAM footprint by almost 2KB (2.2x)
+-- log.trace = function(...) log.log(9, ...) end
+-- log.debug = function(...) log.log(7, ...) end
+-- log.info  = function(...) log.log(5, ...) end
+-- log.warn  = function(...) log.log(4, ...) end
+-- log.error = function(...) log.log(3, ...) end
+-- log.fatal = function(...) log.log(1, ...) end
 
 return log
