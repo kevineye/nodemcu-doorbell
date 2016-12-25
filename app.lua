@@ -10,9 +10,10 @@ local app = {}
 
 function app.run()
     require 'telnet'
-    require 'localtime'
+--    require 'localtime'
     require 'mqtt-connect'
     require 'sensors'
+    require 'doorbell'
     ready = ready - 1
 end
 
