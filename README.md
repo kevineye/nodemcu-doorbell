@@ -60,7 +60,7 @@ Download [nodemcu-uploader.py](https://github.com/kmpm/nodemcu-uploader) for loc
 
 ### Remote management (wifi)
 
-Download [loatool.py](https://github.com/4refr0nt/luatool) for remote (telnet) management.
+Download [luatool.py](https://github.com/4refr0nt/luatool) for remote (telnet) management.
 
     export NODEMCU_HOST=<device-ip>
     export NODEMCU_PORT=2323
