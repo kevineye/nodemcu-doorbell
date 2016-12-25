@@ -7,5 +7,6 @@
   "mqtt_port": 1883,
   "mqtt_user": "-",
   "mqtt_password": "-",
-  "tz_offset": -5.0
+  "tz_offset": -5.0,
+  "ifttt_key": ""
 }
