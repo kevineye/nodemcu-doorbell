@@ -3,7 +3,7 @@ local log = require 'log'
 local m = require 'mqtt-connect'
 local ifttt = require 'ifttt'
 
-doorbell = {}
+local doorbell = {}
 doorbell.PIN_A = 5
 doorbell.PIN_B = 6
 doorbell.PIN_C = 7
@@ -26,9 +26,13 @@ doorbell.chimes[doorbell.PIN_D] = doorbell.PIN_C2
 doorbell.ring = function(button)
     local name = doorbell.names[button]
     log.log(4, MODULE, "pressed " .. button .. " (" .. name .. ")")
-    gpio.serout(doorbell.chimes[button], gpio.HIGH, { 750000, 50000 }, 1, 1)
+    doorbell.ding(doorbell.chimes[button])
     ifttt.trigger('doorbell', button, name)
     m.client:publish(m.prefix .. "/door", '{"door_id":"' .. button .. '","door_name":"' .. name .. '"}', 0, 0)
+end
+
+doorbell.ding = function(pin)
+    gpio.serout(pin, gpio.HIGH, { 750000, 50000 }, 1, 1)
 end
 
 gpio.mode(doorbell.PIN_C1, gpio.OUTPUT)
@@ -45,5 +49,20 @@ gpio.trig(doorbell.PIN_A, 'up', function() doorbell.ring(doorbell.PIN_A) end)
 gpio.trig(doorbell.PIN_B, 'up', function() doorbell.ring(doorbell.PIN_B) end)
 gpio.trig(doorbell.PIN_C, 'up', function() doorbell.ring(doorbell.PIN_C) end)
 gpio.trig(doorbell.PIN_D, 'up', function() doorbell.ring(doorbell.PIN_D) end)
+
+m.onMessage(function(_, t)
+    log.log(7, MODULE, "git " .. t .. " via mqtt")
+    if (t == m.prefix .. "/ding") then
+        doorbell.ding(doorbell.PIN_C2);
+    end
+    if (t == m.prefix .. "/dingdong") then
+        doorbell.ding(doorbell.PIN_C1);
+    end
+end)
+
+m.onConnect(function()
+    m.client:subscribe(m.prefix .. "/ding", 0)
+    m.client:subscribe(m.prefix .. "/dingdong", 0)
+end)
 
 return doorbell
